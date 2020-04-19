@@ -82,16 +82,34 @@ def station():
     return jsonify(station)
 
 @app.route("/api/v1.0/tobs")
-def precipitation():
+def tobs():
     # Create our session (link) from Python to the DB
     session = Session(engine)
 
     """Return a list of all dates and precipitation"""
     # Query all date and precipitation data
-    results = session.query(Measurement.date, Measurement.prcp).all()
+
+    most_active_stn_temps = session.query(Measurement.date, Measurement.tobs).filter(Measurement.station == 'USC00519281').filter(Measurement.date >= '2016-08-23').order_by(Measurement.tobs.asc()).all()
 
     session.close()
+ 
+    
+    return jsonify(most_active_stn_temps)
 
+
+@app.route("/api/v1.0/<start>")
+def start_date(start):
+    """Get temperature data for date provided, or a 404 if not valid."""
+    stn_stats = session.query(Measurement.station, func.min(Measurement.tobs),func.max(Measurement.tobs), func.avg(Measurement.tobs).filter(Measurement.date >= '2016-08-23').all()
+    
+   
+    for stn in stn_stats
+        search_term = stn["start"]
+
+        if search_term == start:
+            return jsonify(stn)
+    session.close()
+ 
 
 
 if __name__ == '__main__':
