@@ -97,20 +97,33 @@ def tobs():
     return jsonify(most_active_stn_temps)
 
 
-@app.route("/api/v1.0/<start>")
+# @app.route("/api/v1.0/date/<start>")
+# def start_date(start):
+#     # Create our session (link) from Python to the DB
+#     session= Session(engine)
+#     stn_stats = session.query((Measurement.station, func.min(Measurement.tobs),func.max(Measurement.tobs), func.avg(Measurement.tobs)).filter(Measurement.date >= start).all()  
+#     session.close()
+#     return jsonify(stn_stats)
+
+@app.route("/api/v1.0/date/<start>")
 def start_date(start):
-    """Get temperature data for date provided, or a 404 if not valid."""
-    stn_stats = session.query(Measurement.station, func.min(Measurement.tobs),func.max(Measurement.tobs), func.avg(Measurement.tobs).filter(Measurement.date >= '2016-08-23').all()
+    session = Session(engine)
+    stn_temp = session.query(Measurement.station, func.min(Measurement.tobs),func.max(Measurement.tobs), func.avg(Measurement.tobs)).\
+        filter(Measurement.date >= start).all()
     
-   
-    for stn in stn_stats
-        search_term = stn["start"]
-
-        if search_term == start:
-            return jsonify(stn)
     session.close()
- 
+    return jsonify(stn_temp)
 
 
-if __name__ == '__main__':
+@app.route("/api/v1.0/date/<start>/<end>")
+def calc_temps(start, end):
+    session = Session(engine)
+    stn_temp_range = session.query(Measurement.station, func.min(Measurement.tobs),func.max(Measurement.tobs), func.avg(Measurement.tobs)).\
+    filter(Measurement.date >= start).filter(Measurement.date <= end).all()
+    
+    session.close()
+    return jsonify(stn_temp_range)
+
+
+if __name__ == "__main__":
     app.run(debug=True)
